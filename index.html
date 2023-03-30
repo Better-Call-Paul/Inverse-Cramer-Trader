@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inverse Cramer - Fade the Trade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Inverse Cramer</h1>
+        <h2>Fade the Trade</h2>
+        <form action="/process" method="post">
+            <label for="tweet">Enter a tweet:</label>
+            <textarea id="tweet" name="tweet" rows="4" cols="50"></textarea>
+            <br>
+            <label for="quantity">Enter quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1">
+            <br>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>

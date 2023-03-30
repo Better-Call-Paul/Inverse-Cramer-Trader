@@ -194,6 +194,5 @@ def main(user_tweet, user_qty):
 # ...
 
 if __name__ == "__main__":
-    # Example tweet for testing
-    example_tweet = "So Tesla takes up the EV sector but beware, many more companies still to come that will be in that sector..."
+
     main(example_tweet, user_qty)

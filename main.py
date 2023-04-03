@@ -5,9 +5,6 @@ import re
 import alpaca_trade_api as tradeapi
 from alpaca_trade_api.rest import REST
 
-#TODO: Try GPT4 for getting the ticker and buy or sell
-#TODO: Make UI Look Nice
-#TODO: Deploy on AWS
 class GPT_Translator:
   
     def __init__(self, api_key):
@@ -16,7 +13,7 @@ class GPT_Translator:
     
     def getResponse(self, tweet):
   
-        API_KEY = "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"
+        API_KEY = "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"
         openai.api_key = API_KEY
         model = "text-davinci-002"
 
@@ -33,33 +30,35 @@ class GPT_Translator:
 
         return response.choices[0].text
     
-    def getTicker(self, tweet):
-        # Check for the regex pattern of a ticker symbol (excluding the dollar symbol)
-        ticker_pattern = r'\$([A-Za-z]+)'
-        match = re.search(ticker_pattern, tweet)
-        if match:
-            ticker = match.group(1)  # Return only the ticker characters (excluding the dollar symbol)
-        else:
-            # If no ticker symbol is found, use GPT-3 to find the company name and its ticker symbol
-            ticker_prompt = "In the following tweet return only the ticker symbol of the company that is being discussed, do not include the $, all the characters must be capitalized, and it must be four characters long: " + tweet
+    def getTicker(self, tweet, alpaca_api_key, alpaca_secret_key):
+        # Initialize the Alpaca API
+        api = tradeapi.REST(alpaca_api_key, alpaca_secret_key, base_url='https://paper-api.alpaca.markets', api_version='v2')
+        
+        #while loop to run until a valid ticker is found
+        #check if the ticker is valid with the get_asset function
+        ticker_prompt = "Based on the following tweet, return only the ticker symbol of the company that is being discussed, do not include the $, all the characters must be capitalized, and it must be four characters long: " + tweet
+      
+        while True:
             response = openai.Completion.create(
-                prompt=ticker_prompt,
-                model="text-davinci-002",
-                max_tokens=10,
-                temperature=0.9,
-                n=1,
-            )
-            # Remove the new line character, strip leading/trailing whitespace, and get the ticker symbol
+            prompt=ticker_prompt,
+            model="text-davinci-002",
+            max_tokens=10,
+            temperature=0.9,
+            n=1,
+        )
             ticker = response.choices[0].text.strip()
-
-        # Validate the length of the ticker symbol and ensure that only the first 4 characters are returned
-        #remove the $ symbol
+            
+            try:
+                asset = api.get_asset(ticker)
+                if asset is not None and asset.tradable:
+                    return ticker
+            except Exception as e:
+                pass
+            
+            continue
     
-        ticker = ticker.replace("$", "")
-        if len(ticker) > 4:
-            ticker = ticker[:4]
-        return ticker
-
+                
+     
         
 class SentimentAnalyzer:
 
@@ -108,8 +107,7 @@ class TradeRecommender:
             stop=None  # Removing stop tokens to get the full response
         )
 
-        # Extract the trade recommendation from the response
-        # Extract the trade recommendation from the response
+        # Extract the trade recommendation from the response and align it to the expected format
         trade_recommendation = response.choices[0].text.strip().lower()
 
         # Validate the trade recommendation to ensure it is either "buy" or "sell"
@@ -136,12 +134,13 @@ class Alpaca:
                 type="market",
                 time_in_force="gtc"
             )
-            
+            return "Trade Executed"
 
         else:
-            print("Insufficient Funds or Shares for this Trade")
+            return "Insufficient Funds or Shares for this Trade"
         
-    #Method to check if the trade is possible
+
+
     def validate_trade(self, symbol, user_qty, side):
         
         account = self.api.get_account()
@@ -163,25 +162,26 @@ class Alpaca:
             return False
              
 def main(user_tweet, user_qty):
-    # GPT
-    gpt_translator = GPT_Translator("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")
-    response = gpt_translator.getResponse(user_tweet)
-    ticker = gpt_translator.getTicker(user_tweet)
-
-    # Analysis
-    sentiment_analyzer = SentimentAnalyzer()
-    sentiment_label, sentiment_scores = sentiment_analyzer.analyze(response)
-        
-    trade_recommender = TradeRecommender("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")
-    trade_recommendation = trade_recommender.recommend_trade(ticker, sentiment_label)
-    
-    # Alpaca Portion
+    #Initilizae Alpaca
     endPoint = "https://paper-api.alpaca.markets"
     api_key = "PKTYVRJBEO95YSKUL43P"
     secret_key = "j0gGhxwheJ4Jlf1kVtLFUNBGcjapxyhlxe4UDfso"
     base_url = "https://paper-api.alpaca.markets"
     alpaca = Alpaca(api_key, secret_key, base_url)
+    # GPT
+    
+    gpt_translator = GPT_Translator("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")
+    response = gpt_translator.getResponse(user_tweet)
+    ticker = gpt_translator.getTicker(user_tweet, api_key, secret_key)
 
+    # Analysis
+    sentiment_analyzer = SentimentAnalyzer()
+    sentiment_label, sentiment_scores = sentiment_analyzer.analyze(response)
+        
+    trade_recommender = TradeRecommender("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")
+    trade_recommendation = trade_recommender.recommend_trade(ticker, sentiment_label)
+    
+ 
     # Execute a market buy order for the ticker
     symbol = ticker
     qty = user_qty
@@ -189,10 +189,12 @@ def main(user_tweet, user_qty):
     alpaca.execute_trade(symbol, qty, side)
 
     # Return the results to be displayed on the website
-    return response, ticker, sentiment_label, sentiment_scores, trade_recommendation
+    #should return the string from execute_trade
+    return response, ticker, sentiment_label, sentiment_scores, trade_recommendation, alpaca.execute_trade(symbol, qty, side)
 
 # ...
 
 if __name__ == "__main__":
-
+    
     main(example_tweet, user_qty)
+

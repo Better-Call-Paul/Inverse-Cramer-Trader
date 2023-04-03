@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inverse Cramer - Fade the Trade</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -16,11 +17,11 @@
         </div>
         <div class="response-section">
             <h3>Response:</h3>
-            <p>{{ response }}</p>
+            <p>Cramer's Analysis: {{ response }}</p>
         </div>
         <div class="sentiment-section">
             <h3>Sentiment Analysis:</h3>
-            <p>{{ sentiment_label }}</p>
+            <p>Inverse Score: {{ sentiment_label }}</p>
             <p>Scores: {{ sentiment_scores }}</p>
         </div>
         <div class="trade-section">
@@ -29,8 +30,57 @@
         </div>
         <div class="trade-execution-section">
             <h3>Trade Execution:</h3>
-            <p>Trade executed successfully!</p>
+            <p>{{ execute_trade }}</p>
         </div>
+        <div>
+            <h3>Portfolio Performance:</h3>
+            <canvas id="portfolio-chart"></canvas>
+        </div>
+        <form action="/">
+            <input type="submit" value="Continue Trading">
+        </form>
     </div>
-</body>
+    <script>
+        // Use the portfolio_data passed from the backend
+        const portfolio_data = {{ portfolio_data | tojson }};
+        
+        // Create an array of datasets, one for each stock
+        const datasets = portfolio_data.map(stock => {
+            return {
+                label: stock.label,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                data: stock.values,
+                fill: false  // Set fill to false for line chart
+            };
+        });
+
+        // Extract the dates from the first stock in the portfolio_data array
+        const labels = portfolio_data.length > 0 ? portfolio_data[0].dates : [];
+
+        // Define the chart data and configuration
+        const data = {
+            labels: labels,  // Use the extracted dates as labels
+            datasets: datasets
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Portfolio Performance Over Time'
+                    }
+                }
+            },
+        };
+
+        // Create the chart
+        const ctx = document.getElementById('portfolio-chart').getContext('2d');
+        const portfolioChart = new Chart(ctx, config);
+    </script>
+   </body>
 </html>

@@ -9,8 +9,8 @@ application = Flask(__name__)
 
 #Alpaca Credentials
 
-alpaca_api_key = "PKTYVRJBEO95YSKUL43P"
-alpaca_secret_key = "j0gGhxwheJ4Jlf1kVtLFUNBGcjapxyhlxe4UDfso"
+alpaca_api_key = #YOUR KEY
+alpaca_secret_key = #YOUR CODE
 alpaca_base_url = "https://paper-api.alpaca.markets"
 
 api = tradeapi(alpaca_api_key, alpaca_secret_key, alpaca_base_url, api_version='v2')

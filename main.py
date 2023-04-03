@@ -5,6 +5,8 @@ import re
 import alpaca_trade_api as tradeapi
 from alpaca_trade_api.rest import REST
 
+#Contains methods to make OpenAI API calls
+#Methods: getResponse, getTicker
 class GPT_Translator:
   
     def __init__(self, api_key):
@@ -13,7 +15,7 @@ class GPT_Translator:
     
     def getResponse(self, tweet):
   
-        API_KEY = "#Your key
+        API_KEY = "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"
         openai.api_key = API_KEY
         model = "text-davinci-002"
 
@@ -57,9 +59,7 @@ class GPT_Translator:
             
             continue
     
-                
-     
-        
+#Sentiment Analysis Section      
 class SentimentAnalyzer:
 
     def __init__(self):
@@ -162,10 +162,10 @@ class Alpaca:
             return False
              
 def main(user_tweet, user_qty):
-    #Initilizae Alpaca
+    #Initiliaze Alpaca Credentials
     endPoint = "https://paper-api.alpaca.markets"
-    api_key = #Your Key
-    secret_key = #Your Key
+    api_key = "PKWQBRRQ0Q8NABKMHHBZ"
+    secret_key = "QqBxn4wSV188r9SpejVcmGzzdOBaaCF4KZxoMLKQ"
     base_url = "https://paper-api.alpaca.markets"
     alpaca = Alpaca(api_key, secret_key, base_url)
     # GPT
@@ -178,7 +178,7 @@ def main(user_tweet, user_qty):
     sentiment_analyzer = SentimentAnalyzer()
     sentiment_label, sentiment_scores = sentiment_analyzer.analyze(response)
         
-    trade_recommender = TradeRecommender("Your_Key")
+    trade_recommender = TradeRecommender("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")
     trade_recommendation = trade_recommender.recommend_trade(ticker, sentiment_label)
     
  

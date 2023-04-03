@@ -4,21 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inverse Cramer - Fade the Trade</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Inverse Cramer</h1>
-        <h2>Fade the Trade</h2>
-        <form action="/process" method="post">
-            <label for="tweet">Enter a tweet:</label>
-            <textarea id="tweet" name="tweet" rows="4" cols="50"></textarea>
-            <br>
-            <label for="quantity">Enter quantity:</label>
-            <input type="number" id="quantity" name="quantity" min="1">
-            <br>
-            <input type="submit" value="Submit">
+    <div class="container mt-5">
+        <h1 class="text-center mb-4">Inverse Cramer</h1>
+        <h2 class="text-center mb-4">Fade the Trade</h2>
+        <form action="/process" method="POST">
+            <div class="mb-3">
+                <label for="tweet" class="form-label">Tweet:</label>
+                <input type="text" class="form-control" id="tweet" name="tweet" placeholder="Enter tweet">
+            </div>
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Quantity (Maximum Shares per Trade is 100):</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -13,7 +13,7 @@ class GPT_Translator:
     
     def getResponse(self, tweet):
   
-        API_KEY = "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"
+        API_KEY = "#Your key
         openai.api_key = API_KEY
         model = "text-davinci-002"
 
@@ -164,8 +164,8 @@ class Alpaca:
 def main(user_tweet, user_qty):
     #Initilizae Alpaca
     endPoint = "https://paper-api.alpaca.markets"
-    api_key = "PKTYVRJBEO95YSKUL43P"
-    secret_key = "j0gGhxwheJ4Jlf1kVtLFUNBGcjapxyhlxe4UDfso"
+    api_key = #Your Key
+    secret_key = #Your Key
     base_url = "https://paper-api.alpaca.markets"
     alpaca = Alpaca(api_key, secret_key, base_url)
     # GPT
@@ -178,7 +178,7 @@ def main(user_tweet, user_qty):
     sentiment_analyzer = SentimentAnalyzer()
     sentiment_label, sentiment_scores = sentiment_analyzer.analyze(response)
         
-    trade_recommender = TradeRecommender("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")
+    trade_recommender = TradeRecommender("Your_Key")
     trade_recommendation = trade_recommender.recommend_trade(ticker, sentiment_label)
     
  

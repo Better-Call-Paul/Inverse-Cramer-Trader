@@ -6,6 +6,7 @@ from alpaca_trade_api.rest import TimeFrame  # Import TimeFrame
 from datetime import datetime, timedelta
 
 application = app = Flask(__name__)
+app.secret_key = "CNBC1208ALPHA"
 
 # Alpaca Credentials
 alpaca_api_key = "PKWQBRRQ0Q8NABKMHHBZ"
@@ -14,17 +15,34 @@ alpaca_base_url = "https://paper-api.alpaca.markets"
 
 api = REST(alpaca_api_key, alpaca_secret_key, alpaca_base_url, api_version='v2')
 
-@app.route('/')
+@application.route('/')
 def index():
-    return render_template('index.html')
+    # Fetch account information
+    account = api.get_account()
+    account_balance = float(account.cash)
+    portfolio_value = float(account.portfolio_value)
+    buying_power = float(account.buying_power)
 
-@app.route('/get_portfolio_data', methods=['GET'])
+    # Fetch positions and format them
+    positions = api.list_positions()
+    for position in positions:
+        position.average_cost = float(position.avg_entry_price)
+        position.market_value = float(position.market_value)
+        position.unrealized_pl = float(position.unrealized_pl)
+
+    return render_template('index.html', account_balance=account_balance, portfolio_value=portfolio_value, buying_power=buying_power, positions=positions)
+
+
+#Returns the data for the portfolio
+@application.route('/get_portfolio_data', methods=['GET'])
 def get_portfolio_data():
+    # Get the current date and the date from 30 days ago
     end_date = datetime.now()
     time_span = end_date - timedelta(days=30)
     portfolio_data = []
     positions = api.list_positions()
     
+    # Get the historical prices for the last 30 days and format the data
     for position in positions:
         symbol = position.symbol
         # Format the start and end dates as ISO 8601 strings
@@ -44,30 +62,36 @@ def get_portfolio_data():
         
     return jsonify(portfolio_data)
 
-@app.route('/process', methods=['POST'])
+# Process the user's tweet
+# and return the results to be displayed on the website
+# This is the function that will be called when the user submits the form
+@application.route('/process', methods=['POST'])
 def process():
     user_tweet = request.form['tweet']
     try:
         user_qty = int(request.form['quantity'])
+    # If the user enters a non-integer value for quantity, redirect them to the home page
     except ValueError:
         flash("Please enter a valid integer for quantity.")
         return redirect(url_for('index'))
-
+    # If the user enters a quantity greater than 100, redirect them to the home page
     if user_qty > 100:
         flash("The Maximum amount of Shares per trade is 100.")
         return redirect(url_for('index'))
 
+    # Call the main function from main.py
     response, ticker, sentiment_label, sentiment_scores, trade_recommendation, execute_trade = main(user_tweet, user_qty)
     
     # Get portfolio data
     portfolio_data = get_portfolio_data().get_json()
     
-    return render_template('result.html', tweet=user_tweet, response=response, ticker=ticker, sentiment_label=sentiment_label, sentiment_scores=sentiment_scores, trade_recommendation=trade_recommendation, execute_trade=execute_trade, portfolio_data=portfolio_data)
+    # If the trade was executed, display a success message
+    execute_trade = "Trade Executed Successfully!" if execute_trade else "Insufficient Funds or Shares for this Trade."
+
+    # return the results to be displayed on the website
+    return render_template("result.html", tweet=user_tweet, response=response, sentiment_label=sentiment_label, sentiment_scores=sentiment_scores, trade_recommendation=trade_recommendation, execute_trade=execute_trade, portfolio_data=portfolio_data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-
-
-
+    application.run(debug=True)
 
 

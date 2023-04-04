@@ -5,7 +5,7 @@ from alpaca_trade_api import REST
 from alpaca_trade_api.rest import TimeFrame  # Import TimeFrame
 from datetime import datetime, timedelta
 
-app = Flask(__name__)
+application = app = Flask(__name__)
 
 # Alpaca Credentials
 alpaca_api_key = "PKWQBRRQ0Q8NABKMHHBZ"

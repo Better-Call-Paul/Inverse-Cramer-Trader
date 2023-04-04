@@ -6,11 +6,11 @@ from alpaca_trade_api.rest import TimeFrame  # Import TimeFrame
 from datetime import datetime, timedelta
 
 application = app = Flask(__name__)
-app.secret_key = "CNBC1208ALPHA"
+app.secret_key = "YOUR-KEY"
 
 # Alpaca Credentials
-alpaca_api_key = "PKWQBRRQ0Q8NABKMHHBZ"
-alpaca_secret_key = "QqBxn4wSV188r9SpejVcmGzzdOBaaCF4KZxoMLKQ"
+alpaca_api_key = "YOUR-KEY"
+alpaca_secret_key = "YOUR-KEY"
 alpaca_base_url = "https://paper-api.alpaca.markets"
 
 api = REST(alpaca_api_key, alpaca_secret_key, alpaca_base_url, api_version='v2')

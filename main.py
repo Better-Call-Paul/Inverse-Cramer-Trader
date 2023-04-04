@@ -36,10 +36,9 @@ class GPT_Translator:
         # Initialize the Alpaca API
         api = tradeapi.REST(alpaca_api_key, alpaca_secret_key, base_url='https://paper-api.alpaca.markets', api_version='v2')
         
-        #while loop to run until a valid ticker is found
-        #check if the ticker is valid with the get_asset function
+     
         ticker_prompt = "Based on the following tweet, return only the ticker symbol of the company that is being discussed, do not include the $, all the characters must be capitalized, and it must be four characters long: " + tweet
-      
+        #while loop to run until a valid ticker is found
         while True:
             response = openai.Completion.create(
             prompt=ticker_prompt,
@@ -63,28 +62,43 @@ class GPT_Translator:
 class SentimentAnalyzer:
 
     def __init__(self):
-        self.roberta = "cardiffnlp/twitter-roberta-base-sentiment"
+        self.roberta = "cardiffnlp/twitter-roberta-base-sentiment" #from Hugging Face: https://huggingface.co/cardiffnlp/twitter-roberta-base-sentiment
+        #Load the model and tokenizer
         self.model = AutoModelForSequenceClassification.from_pretrained(self.roberta)
         self.tokenizer = AutoTokenizer.from_pretrained(self.roberta)
+        #Labels for the sentiment analysis
         self.labels = ['Negative', 'Neutral', 'Positive']
 
+    #Parameters: tweet - the tweet to be analyzed
+    #Returns: the sentiment label and the scores for each label
     def analyze(self, response):
+        # Preprocess the response
         response_words = []
         for word in response.split(' '):
+            # Remove usernames
             if word.startswith('@') and len(word) > 1:
                 word = '@user'
+            #Remove the URL
             elif word.startswith('http'):
                 word = "http"
             response_words.append(word)
 
+        #Concatenate Processed Words into Processed Response
         response_proc = " ".join(response_words)
+ 
+        #Encode the response, using Hugging Face's tokenizer
         encoded_response = self.tokenizer(response_proc, return_tensors='pt')
+        #Get the sentiment scores from the model
         output = self.model(**encoded_response)
+        #Get the scores for each label
         scores = output[0][0].detach().numpy()
+        #Normalize the scores
         scores = softmax(scores)
         
+        #Get the label with the lowest score
         minimum_score = scores.argmin()
         minimum_label = self.labels[minimum_score]
+        #Return the label and scores
         return minimum_label, scores
     
 class TradeRecommender:
@@ -93,6 +107,9 @@ class TradeRecommender:
         self.api_key = api_key
         openai.api_key = self.api_key
 
+    # Parameters: ticker - the ticker of the stock to be traded
+    #             sentiment_label - the sentiment label of the stock
+    # Returns: the trade recommendation: either "buy" or "sell"
     def recommend_trade(self, ticker, sentiment_label):
         #get the minimum_label from the sentiment analyzer
         
@@ -124,23 +141,38 @@ class Alpaca:
     def __init__(self, api_key, secret_key, base_url):
         self.api = tradeapi.REST(api_key, secret_key, base_url)
         
-    #Method to execute a trade
-    def execute_trade(self, symbol, user_qty, side):
-        if (self.validate_trade(symbol, user_qty, side) == True):
+    # Parameters: symbol - the ticker of the stock to be traded
+    #             qty - the quantity of shares to be traded
+    #             side - the side of the trade (either "buy" or "sell")
+    # Returns: the result of the trade
+    def execute_trade(self, symbol, qty, side):
+        try:
+            # Check if the quantity is greater than the maximum allowed (100)
+            if qty > 100:
+                return f"Error: Maximum shares per trade is 100. Please adjust the quantity."
+
+            # Check if it's a sell order and if the user has enough shares
+            if side == 'sell':
+                position = self.api.get_position(symbol)
+                if int(position.qty) < qty:
+                    return f"Error: You don't have enough shares to sell. You have {position.qty} shares of {symbol}."
+
+            # If both checks pass, submit the order
             market_order = self.api.submit_order(
                 symbol=symbol,
-                qty=user_qty,
+                qty=qty,
                 side=side,
-                type="market",
-                time_in_force="gtc"
+                type='market',
+                time_in_force='gtc'
             )
-            return "Trade Executed"
+            return f"Order submitted: {market_order}"
+        except Exception as e:
+            return f"Error: {str(e)}"
 
-        else:
-            return "Insufficient Funds or Shares for this Trade"
-        
-
-
+    # Parameters: symbol - the ticker of the stock to be traded
+    #             user_qty - the quantity of shares to be traded
+    #             side - the side of the trade (either "buy" or "sell")
+    # Returns: True if the trade is valid, False otherwise
     def validate_trade(self, symbol, user_qty, side):
         
         account = self.api.get_account()

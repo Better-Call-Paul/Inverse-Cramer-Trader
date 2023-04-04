@@ -1,6 +1,6 @@
 # Inverse-Cramer-Trader
 
-Inverse-Cramer Trader is an algorithmic trading web application that uses natural language processing (Hugging Face roBERTa) to analyze inputed finnancial opinions on public companys through sentiment analysis to make trades on the stock market. The application is built with Python and utilizes the PyTorch and Transformers libraries for NLP, as well as the Alpaca API for trading.
+Inverse-Cramer Trader is an algorithmic trading web application that uses natural language processing (Hugging Face roBERTa) to analyze inputed finnancial opinions on public companys through sentiment analysis to make trades on the stock market. The application is built with Python and utilizes the PyTorch and Transformers libraries for NLP, OpenAI API for initial analysis and ticker retrieval as well as the Alpaca API for trading.
 
 ## Installation
 
@@ -26,10 +26,9 @@ This will start the Flask web server and present the index.html screen for user 
 
 ## Configuration 
 
-Before using the application, you will need to configure it with your Alpaca API credentials. Create a file named .env in the project directory and add the following lines:
+Before using the application, you will need to configure it with your own Alpaca API and OpenAI credentials in the following lines.
 ```
-makefile
-Copy code
+API_KEY = "your_OpenAI_API_Key"
 APCA_API_KEY_ID=<your_alpaca_api_key_id>
 APCA_API_SECRET_KEY=<your_alpaca_api_secret_key>
 APCA_API_BASE_URL=https://paper-api.alpaca.markets

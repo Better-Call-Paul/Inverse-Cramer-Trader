@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inverse Cramer - Fade the Trade</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Inverse Cramer - Fade the Trade</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <style>
+            body {
+                background-color: black;
+                color: limegreen;
+            }
+        </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
         <h1>Inverse Cramer</h1>
         <h2>Fade the Trade</h2>
-        <div class="tweet-section">
+        <div class="box tweet-section">
             <h3>Tweet:</h3>
             <p>{{ tweet }}</p>
         </div>
-        <div class="response-section">
+        <div class="box response-section">
             <h3>Response:</h3>
             <p>Cramer's Analysis: {{ response }}</p>
         </div>
-        <div class="sentiment-section">
+        <div class="box sentiment-section">
             <h3>Sentiment Analysis:</h3>
             <p>Inverse Score: {{ sentiment_label }}</p>
             <p>Scores: {{ sentiment_scores }}</p>
         </div>
-        <div class="trade-section">
+        <div class="box trade-section">
             <h3>Trade Recommendation:</h3>
             <p>{{ trade_recommendation }}</p>
         </div>
-        <div class="trade-execution-section">
+        <div class="box trade-execution-section">
             <h3>Trade Execution:</h3>
             <p>{{ execute_trade }}</p>
         </div>
-        <div>
+        <div class="box">
             <h3>Portfolio Performance:</h3>
             <canvas id="portfolio-chart"></canvas>
         </div>
@@ -55,7 +62,7 @@
             };
         });
 
-        // Extract the dates from the first stock in the portfolio_data array
+        // Extract the dates from the first stock in the portfolio_data array, if it exists or else use an empty array
         const labels = portfolio_data.length > 0 ? portfolio_data[0].dates : [];
 
         // Define the chart data and configuration
@@ -82,5 +89,5 @@
         const ctx = document.getElementById('portfolio-chart').getContext('2d');
         const portfolioChart = new Chart(ctx, config);
     </script>
-   </body>
+</body>
 </html>

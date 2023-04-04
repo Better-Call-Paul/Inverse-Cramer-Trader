@@ -5,7 +5,7 @@ from alpaca_trade_api import REST
 from alpaca_trade_api.rest import TimeFrame  # Import TimeFrame
 from datetime import datetime, timedelta
 
-application = Flask(__name__)
+app = Flask(__name__)
 
 # Alpaca Credentials
 alpaca_api_key = "PKWQBRRQ0Q8NABKMHHBZ"
@@ -14,11 +14,11 @@ alpaca_base_url = "https://paper-api.alpaca.markets"
 
 api = REST(alpaca_api_key, alpaca_secret_key, alpaca_base_url, api_version='v2')
 
-@application.route('/')
+@app.route('/')
 def index():
     return render_template('index.html')
 
-@application.route('/get_portfolio_data', methods=['GET'])
+@app.route('/get_portfolio_data', methods=['GET'])
 def get_portfolio_data():
     end_date = datetime.now()
     time_span = end_date - timedelta(days=30)
@@ -44,7 +44,7 @@ def get_portfolio_data():
         
     return jsonify(portfolio_data)
 
-@application.route('/process', methods=['POST'])
+@app.route('/process', methods=['POST'])
 def process():
     user_tweet = request.form['tweet']
     try:
@@ -65,7 +65,7 @@ def process():
     return render_template('result.html', tweet=user_tweet, response=response, ticker=ticker, sentiment_label=sentiment_label, sentiment_scores=sentiment_scores, trade_recommendation=trade_recommendation, execute_trade=execute_trade, portfolio_data=portfolio_data)
 
 if __name__ == '__main__':
-    application.run(debug=True)
+    app.run(debug=True)
 
 
 

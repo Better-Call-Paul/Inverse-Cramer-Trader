@@ -36,8 +36,10 @@ APCA_API_BASE_URL=https://paper-api.alpaca.markets
 ```
 Replace <your_alpaca_api_key_id> and <your_alpaca_api_secret_key> with your own API credentials. Note that this application is currently configured to use the Alpaca Paper Trading API, with the base url determining live/paper trades.
 
-Contributing
+## Contributing
+
 Contributions to Inverse-Cramer Trader are welcome! Please open an issue or pull request on the GitHub repository.
 
-License
+## License
+
 This project is licensed under the MIT License. See the LICENSE file for details.

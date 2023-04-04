@@ -5,30 +5,31 @@ Inverse-Cramer Trader is an algorithmic trading web application that uses natura
 Installation
 To use Inverse-Cramer Trader, first clone the repository:
 
-bash
-Copy code
+'''
 git clone https://github.com/your_username/inverse-cramer-trader.git
-Then navigate to the project directory and install the required packages:
+'''
 
-bash
-Copy code
+Then navigate to the project directory and install the required packages:
+'''
 cd inverse-cramer-trader
 pip install -r requirements.txt
+'''
 Usage
 To start the application, run the following command:
-
-Copy code
+'''
 python application.py
+'''
 This will start the Flask web server and present the index.html screen for user input
 
 Configuration
 Before using the bot, you will need to configure it with your Alpaca API credentials. Create a file named .env in the project directory and add the following lines:
-
+'''
 makefile
 Copy code
 APCA_API_KEY_ID=<your_alpaca_api_key_id>
 APCA_API_SECRET_KEY=<your_alpaca_api_secret_key>
 APCA_API_BASE_URL=https://paper-api.alpaca.markets
+'''
 Replace <your_alpaca_api_key_id> and <your_alpaca_api_secret_key> with your own API credentials. Note that this application is currently configured to use the Alpaca Paper Trading API, with the base url determining live/paper trades.
 
 Contributing
